@@ -106,3 +106,9 @@ https://github.com/bernarddesfosse/onix_compatible_appx/releases/download/1.16.1
 1.16.40
 1.16.4002.0
 https://github.com/bernarddesfosse/onix_compatible_appx/releases/download/1.16.40/Minecraft-1.16.40.2.Appx
+1.12.1
+1.12.101.0
+https://github.com/bernarddesfosse/onix_compatible_appx/releases/download/1.12.1/1.12.1.Appx
+1.12.0
+1.12.28.0
+https://github.com/bernarddesfosse/onix_compatible_appx/releases/download/1.12.0/1.12.0.Appx
