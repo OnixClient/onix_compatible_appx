@@ -1,3 +1,6 @@
+1.19.63
+1.19.6301.0
+https://github.com/bernarddesfosse/onix_compatible_appx/releases/download/1.19.63/1.19.63.Appx
 1.19.62
 1.19.6201.0
 https://github.com/bernarddesfosse/onix_compatible_appx/releases/download/1.19.62/1.19.62.Appx
