@@ -1,3 +1,6 @@
+1.20.31
+1.20.3101.0
+https://github.com/bernarddesfosse/onix_compatible_appx/releases/download/1.20.31/1.20.31.Appx
 1.20.30
 1.20.3002.0
 https://github.com/bernarddesfosse/onix_compatible_appx/releases/download/1.20.30/1.20.30.Appx
