@@ -16,6 +16,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
       with:
+        token: "secrets.ACTION_REPOSITORY_ACCESS_TOKEN"
         fetch-depth: 0
 
     # Install the .NET Core workload
@@ -30,9 +31,9 @@ jobs:
         cd $GITHUB_WORKSPACE/JsonGenerator/net6.0
         dotnet AppxListJsonFromText.dll
         cd ../..
-        git remote set-url origin https://bernarddesfosse:$ACTION_REPOSITORY_ACCESS_TOKEN@github.com/bernarddesfosse/onix_compatible_appx.git
         git config --global user.name bernarddesfosse
         git config --global user.email bernarddesfosse@users.noreply.github.com
+        git config --global credential.helper cache
         git add .
         git commit -m "Generated JSON Data"
         git push
