@@ -3,12 +3,14 @@ name: Make JSON from TXT
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
+    
+permissions:
+    contents: write
+    pull-requests: read
+    
 jobs:
 
-  build:
+  build_json:
     runs-on: ubuntu-latest  # For a list of available runner types, refer to
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
 
@@ -26,12 +28,13 @@ jobs:
         
     - name: Run json generator
       run: |
-        echo repository: $GITHUB_REPOSITORY
-        cd $GITHUB_REPOSITORY
-        ls
-        dotnet JsonGenerator/net6.0/AppxListJsonFromText.dll
-        git config user.name JsonBoy
-        git config user.email github-actions@github.com
-        git add .
-        git commit -m "Generated JSON Data"
-        git push
+        echo repository: $GITHUB_WORKSPACE
+        cd $GITHUB_WORKSPACE/JsonGenerator/net6.0
+        dotnet AppxListJsonFromText.dll
+        cd ../..
+        
+    - name: Commit changes
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Update json files from txt
+        
