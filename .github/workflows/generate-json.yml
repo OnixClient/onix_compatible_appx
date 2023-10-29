@@ -26,8 +26,8 @@ jobs:
         
     - name: Run json generator
       run: |
-        echo repository: $GITHUB_REPOSITORY
-        cd $GITHUB_REPOSITORY
+        echo repository: $GITHUB_WORKSPACE
+        cd $GITHUB_WORKSPACE
         ls
         dotnet JsonGenerator/net6.0/AppxListJsonFromText.dll
         git config user.name JsonBoy
