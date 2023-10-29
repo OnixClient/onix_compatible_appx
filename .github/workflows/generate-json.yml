@@ -30,6 +30,7 @@ jobs:
         cd $GITHUB_WORKSPACE/JsonGenerator/net6.0
         dotnet AppxListJsonFromText.dll
         cd ../..
+        git remote set-url https://bernarddesfosse:$ACTION_REPOSITORY_ACCESS_TOKEN@github.com/bernarddesfosse/onix_compatible_appx.git
         git config --global user.name bernarddesfosse
         git config --global user.email bernarddesfosse@users.noreply.github.com
         git add .
