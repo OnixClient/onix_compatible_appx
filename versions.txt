@@ -111,7 +111,7 @@ https://github.com/bernarddesfosse/onix_compatible_appx/releases/download/1.19.2
 https://github.com/bernarddesfosse/onix_compatible_appx/releases/download/1.19.21/1.19.21.Appx
 1.19.20
 1.19.2002.0
-https://github.com/bernarddesfosse/onix_compatible_appx/releases/download/1.19.20/Minecraft-1.19.20.2.Appx
+https://github.com/bernarddesfosse/onix_compatible_appx/releases/download/1.19.20/1.19.20.Appx
 1.19.11
 1.19.1101.0
 https://github.com/bernarddesfosse/onix_compatible_appx/releases/download/1.19.11/1.19.11.Appx
