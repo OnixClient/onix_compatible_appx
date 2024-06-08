@@ -198,4 +198,4 @@ https://github.com/OnixClient/onix_compatible_appx/releases/download/1.16.40/1.1
 https://github.com/OnixClient/onix_compatible_appx/releases/download/1.12.1/1.12.1.Appx
 1.12.0
 1.12.28.0
-https://github.com/bernarddesfosse/onix_compatible_appx/releases/download/1.12.0/1.12.0.Appx
+https://github.com/OnixClient/onix_compatible_appx/releases/download/1.12.0/1.12.0.Appx
