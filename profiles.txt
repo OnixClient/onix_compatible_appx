@@ -1,6 +1,6 @@
 All Versions
 versions
-https://raw.githubusercontent.com/bernarddesfosse/onix_compatible_appx/main/versions.txt
+https://raw.githubusercontent.com/OnixClient/onix_compatible_appx/main/versions.txt
 SDK Versions
 sdkversions
-https://raw.githubusercontent.com/bernarddesfosse/onix_compatible_appx/main/sdkversions.txt
+https://raw.githubusercontent.com/OnixClient/onix_compatible_appx/main/sdkversions.txt
