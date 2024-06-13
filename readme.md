@@ -51,9 +51,9 @@ To use it just select the format you want to use and copy the url.
 
 TXT
 ```
-https://raw.githubusercontent.com/bernarddesfosse/onix_compatible_appx/main/profiles.txt
+https://raw.githubusercontent.com/OnixClient/onix_compatible_appx/main/profiles.txt
 ```
 JSON
 ```
-https://raw.githubusercontent.com/bernarddesfosse/onix_compatible_appx/main/profiles.json
+https://raw.githubusercontent.com/OnixClient/onix_compatible_appx/main/profiles.json
 ```
