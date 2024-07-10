@@ -1,3 +1,6 @@
+1.21.2
+1.21.202.0
+https://github.com/OnixClient/onix_compatible_appx/releases/download/1.21.2/1.21.2.Appx
 1.21.1
 1.21.103.0
 https://github.com/OnixClient/onix_compatible_appx/releases/download/1.21.1/1.21.1.Appx
