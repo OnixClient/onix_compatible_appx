@@ -1,3 +1,6 @@
+1.21.120
+1.21.12004.0
+https://github.com/OnixClient/onix_compatible_appx/releases/download/1.21.120/1.21.120.msixvc
 1.21.114
 1.21.11401.0
 https://github.com/OnixClient/onix_compatible_appx/releases/download/1.21.114/1.21.114.Appx
