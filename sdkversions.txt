@@ -1,3 +1,6 @@
+1.26.0
+1.26.2.0
+https://github.com/OnixClient/onix_compatible_appx/releases/download/1.26.0/1.26.0.msixvc
 1.21.131
 1.21.13101.0
 https://github.com/OnixClient/onix_compatible_appx/releases/download/1.21.131/1.21.131.msixvc
