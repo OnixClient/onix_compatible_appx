@@ -1,3 +1,6 @@
+1.26.30
+1.26.3005.0
+http://assets1.xboxlive.com/12/480484ea-7b1c-4443-b152-411e07e1329d/7792d9ce-355a-493c-afbd-768f4a77c3b0/1.26.3005.0.48bff00d-cff7-4432-8d1e-662d92be1b14/Microsoft.MinecraftUWP_1.26.3005.0_x64__8wekyb3d8bbwe.msixvc
 1.26.20
 1.26.2004.0
 https://github.com/OnixClient/onix_compatible_appx/releases/download/1.26.20/1.26.20.msixvc
