@@ -1,3 +1,6 @@
+1.26.44
+1.26.4403.0
+http://assets1.xboxlive.com/Z/343b46e3-cf8d-4d07-b95d-97578788d4ff/7792d9ce-355a-493c-afbd-768f4a77c3b0/1.26.4403.0.c576ef1b-0106-4b07-82d9-441f5b2eb985/Microsoft.MinecraftUWP_1.26.4403.0_x64__8wekyb3d8bbwe.msixvc
 1.26.42
 1.26.4201.0
 http://assets1.xboxlive.com/13/c385ae75-5cc0-4140-9b1f-7c24b8ec799b/7792d9ce-355a-493c-afbd-768f4a77c3b0/1.26.4201.0.4c345687-4f56-4eb5-b66f-4460f2f0fa62/Microsoft.MinecraftUWP_1.26.4201.0_x64__8wekyb3d8bbwe.msixvc
