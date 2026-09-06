@@ -4,3 +4,6 @@ https://raw.githubusercontent.com/OnixClient/onix_compatible_appx/main/versions.
 SDK Versions
 sdkversions
 https://raw.githubusercontent.com/OnixClient/onix_compatible_appx/main/sdkversions.txt
+All Versions (v2)
+versionsv2
+https://raw.githubusercontent.com/OnixClient/onix_compatible_appx/main/versionsv2.json

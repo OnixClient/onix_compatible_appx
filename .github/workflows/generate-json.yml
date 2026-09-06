@@ -36,5 +36,5 @@ jobs:
     - name: Commit changes
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
-        commit_message: Update json files from txt
+        commit_message: Update generated files from versions.yaml
         
