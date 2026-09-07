@@ -5,15 +5,18 @@
 * Dependencies are in the repository
   * The GDK versions need the UWPDesktop variant.
   * GDK versions also need windows app runtime https://aka.ms/windowsappsdk/1.8/latest/windowsappruntimeinstall-x64.exe
+  * An up to date Xbox app:  ms-windows-store://downloadsandupdates and then open it once and let it do any updates it wants.
 * List of available versions is in the repository
 * List of available versions is generated from versions.yaml, the old v1 docs are in OldV1Docs.txt
 
 ## Version List v2 (versionsv2.json)
-A list of versions and how to download and install them. It is an array of version entries:
+An object holding the version list and the dependency profiles the versions reference:
+`versions` is an array of version entries:
 * `version` - *(string) The display version. Split on `.` to get the numeric parts.*
 * `package_version` - *(string) The package version. Split on `.` to get the numeric parts.*
 * `sdk` - *(boolean) Whether this version is in the SDK Versions profile.*
 * `install_type` - *(string) `uwp` or `msixvc` (how the package installs (1.21.120+ is msixvc)).*
+* `dependency_profile` - *(string) The name of the entry in `dependency_profiles` this version needs.*
 * `url` - *(object) The primary download.*
 * `mirror_url` - *(object|null) The same package as the primary download, mirrored from GitHub. Null when there is no mirror.*
 * `xdelta_url` - *(object|null) The xdelta3 patch file for this release, null when the release has no delta.*
@@ -40,6 +43,27 @@ per `install_type`.
 ### Mirrors
 `mirror_url` mirrors the same package as the primary `url`, so its type can differ from the primary's
 (the mirror is zipped even when the primary is a direct file, or the other way around).
+
+### Dependency profiles (dependency_profiles)
+A map of profile name to a list of dependencies that the versions referencing that profile need.
+Every dependency installs machine wide and side by side, install them once and switching game
+versions never removes them. A package dependency is a minimum, not a pin, so each family is
+listed once at its latest x64 release and satisfies every version of Minecraft that ever
+referenced it.
+* `name` - *(string) The package identity of the dependency.*
+* `version` - *(string) The version of the shipped file, or the minimum package version the system must have.*
+* `install_type` - *(string) `appx` (install with `Add-AppxPackage -Path`), `exe` (a Win32 installer), or `ask` (no download).*
+* `prompt` - *(string|null, ask only) The message to show the user; the launcher checks the installed package version itself.*
+* `quiet_args` - *(array of strings|null, exe only) The command line arguments that run the exe installer without output, e.g. `["-q"]`.*
+* `url` - *(object|null) The download for this dependency, same object shape as the version downloads. Null for `ask`.*
+
+The profiles for the current version span:
+* `uwp_engagement` - *1.12.0 to 1.21.51: plain VCLibs + Store Engagement (declared in every manifest in this span).*
+* `uwp` - *1.21.60 to 1.21.114: plain VCLibs only (Mojang dropped Engagement from the manifest).*
+* `gdk` - *1.21.120+: Xbox App and Gaming Services as `ask` checks (a fresh system can be too far behind to install msixvc), UWPDesktop VCLibs + Windows App Runtime 1.8 (the msixvc packaging universe).*
+
+Plain VCLibs and UWPDesktop VCLibs are different package identities and coexist without conflict,
+which is why one map covers all versions.
 <br><br>
 ---
 

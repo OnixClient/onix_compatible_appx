@@ -3,6 +3,49 @@
 # do NOT hand-edit any of the generated files.
 raw_base: https://raw.githubusercontent.com/OnixClient/onix_compatible_appx/main
 
+# Dependency profiles: named sets of dependencies a Minecraft version needs.
+# Each version references one profile by name.
+# Dependencies install once per machine; install_type is appx (Add-AppxPackage), exe (installer,
+# quiet_args holds its command line arguments for silent running) or ask (no download, the launcher
+# shows prompt and checks the installed package version itself). A package dependency is a minimum,
+# not a pin, so every profile lists the latest x64 release of each family.
+dependency_profiles:
+  - name: uwp_engagement
+    dependencies:
+      - name: Microsoft.VCLibs.140.00
+        version: 14.0.33519.0
+        install_type: appx
+        url: https://raw.githubusercontent.com/OnixClient/onix_compatible_appx/main/Microsoft.VCLibs.140.00.Appx
+      - name: Microsoft.Services.Store.Engagement
+        version: 10.0.19011.0
+        install_type: appx
+        url: https://raw.githubusercontent.com/OnixClient/onix_compatible_appx/main/Microsoft.Services.Store.Engagement_10.0.19011.0_x64__8wekyb3d8bbwe.Appx
+  - name: uwp
+    dependencies:
+      - name: Microsoft.VCLibs.140.00
+        version: 14.0.33519.0
+        install_type: appx
+        url: https://raw.githubusercontent.com/OnixClient/onix_compatible_appx/main/Microsoft.VCLibs.140.00.Appx
+  - name: gdk
+    dependencies:
+      - name: Microsoft.GamingApp
+        version: 2608.1001.17.0
+        install_type: ask
+        prompt: Please update the Xbox App in the microsoft store then open it once before attempting to install this version.
+      - name: Microsoft.GamingServices
+        version: 38.116.6003.0
+        install_type: ask
+        prompt: Please update the Xbox App in the microsoft store then open it once before attempting to install this version.
+      - name: Microsoft.VCLibs.140.00.UWPDesktop
+        version: 14.0.33728.0
+        install_type: appx
+        url: https://raw.githubusercontent.com/OnixClient/onix_compatible_appx/main/Microsoft.VCLibs.140.00.UWPDesktop.Appx
+      - name: Microsoft.WindowsAppRuntime
+        version: 1.8
+        install_type: exe
+        quiet_args: -q
+        url: https://aka.ms/windowsappsdk/1.8/latest/windowsappruntimeinstall-x64.exe
+
 versions:
   - version: 1.26.45
     package_version: 1.26.4501.0

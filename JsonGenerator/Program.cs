@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 AppxListJsonFromText appxListJsonFromText = new AppxListJsonFromText();
@@ -65,6 +66,23 @@ internal class DownloadUrl
     public string type { get; set; }
 }
 
+internal class DependencyEntry
+{
+    public string name { get; set; }
+    public string version { get; set; }
+    public string install_type { get; set; }
+    public string prompt { get; set; }
+    public string quiet_args { get; set; }
+    public string url { get; set; }
+    public string url_type { get; set; }
+}
+
+internal class DependencyProfile
+{
+    public string name { get; set; }
+    public List<DependencyEntry> dependencies { get; set; } = new List<DependencyEntry>();
+}
+
 internal class Download
 {
     public string type { get; set; }
@@ -77,9 +95,31 @@ internal class VersionEntryV2
     public string package_version { get; set; }
     public bool sdk { get; set; }
     public string install_type { get; set; }
+    public string dependency_profile { get; set; }
     public Download url { get; set; }
     public Download mirror_url { get; set; }
     public Download xdelta_url { get; set; }
+}
+
+internal class DependencyJson
+{
+    public string name { get; set; }
+    public string version { get; set; }
+    public string install_type { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string prompt { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<string> quiet_args { get; set; }
+
+    public Download url { get; set; }
+}
+
+internal class VersionsV2Payload
+{
+    public List<VersionEntryV2> versions { get; set; }
+    public Dictionary<string, List<DependencyJson>> dependency_profiles { get; set; }
 }
 
 internal class ProfileData
@@ -104,13 +144,14 @@ internal class VersionData
     public string xdelta_url { get; set; }
     public string xdelta_url_type { get; set; }
     public string install_type { get; set; }
-    public string download_type { get; set; }
+    public string dependency_profile { get; set; }
 }
 
 internal class YamlModel
 {
     public string raw_base { get; set; }
     public List<VersionData> versions { get; set; } = new List<VersionData>();
+    public List<DependencyProfile> dependency_profiles { get; set; } = new List<DependencyProfile>();
 }
 
 internal class YamlException : Exception
@@ -121,7 +162,9 @@ internal class YamlException : Exception
 internal static class VersionsYaml
 {
     private static readonly string[] VersionKeys = { "version", "package_version", "sdk", "url", "url_type",
-        "mirror_urls", "mirror_type", "xdelta_url", "xdelta_url_type", "install_type" };
+        "mirror_urls", "mirror_type", "xdelta_url", "xdelta_url_type", "install_type", "dependency_profile" };
+
+    private static readonly string[] DependencyKeys = { "name", "version", "install_type", "prompt", "quiet_args", "url", "url_type" };
 
     private static string InferUrlType(string url)
     {
@@ -142,6 +185,9 @@ internal static class VersionsYaml
         bool inMirrors = false;
         bool inMirrorMap = false;
         DownloadUrl curMirror = null;
+        DependencyProfile curProfile = null;
+        DependencyEntry curDependency = null;
+        bool inDependencies = false;
 
         for (int i = 0; i < lines.Length; i++)
         {
@@ -169,7 +215,7 @@ internal static class VersionsYaml
                     throw new YamlException($"line {n}: expected 'key:' at top level, got: {line}");
                 string key = m.Groups[1].Value;
                 string val = m.Groups[2].Value.Trim();
-                if (key != "raw_base" && key != "versions")
+                if (key != "raw_base" && key != "versions" && key != "dependency_profiles")
                     throw new YamlException($"line {n}: unknown top-level key '{key}'");
                 if (key == "raw_base")
                 {
@@ -182,11 +228,80 @@ internal static class VersionsYaml
                     throw new YamlException($"line {n}: top-level key '{key}' must be a section header");
                 section = key;
                 curVersion = null; inMirrors = false; inMirrorMap = false;
+                curProfile = null; curDependency = null; inDependencies = false;
                 continue;
             }
 
             if (section == null)
                 throw new YamlException($"line {n}: content before any top-level section: {line}");
+
+            if (section == "dependency_profiles")
+            {
+                if (indent == 2 && line.StartsWith("- "))
+                {
+                    curProfile = new DependencyProfile();
+                    model.dependency_profiles.Add(curProfile);
+                    curDependency = null;
+                    line = line.Substring(2).Trim();
+                }
+                else if (indent == 2)
+                {
+                    throw new YamlException($"line {n}: expected a '- ' profile item at this indentation, got: {line}");
+                }
+                else if (indent != 4 && indent != 6 && indent != 8)
+                {
+                    throw new YamlException($"line {n}: unexpected indentation (expected 2, 4, 6 or 8 spaces), got: {line}");
+                }
+                if (curProfile == null)
+                    throw new YamlException($"line {n}: profile key before '- ' item start");
+
+                string probe = line;
+                if (indent <= 6 && probe.StartsWith("- ")) probe = probe.Substring(2).Trim();
+                Match pkv = Regex.Match(probe, @"^([A-Za-z_][A-Za-z0-9_]*):(.*)$");
+                if (!pkv.Success)
+                    throw new YamlException($"line {n}: expected 'key: value', got: {line}");
+                string pkey = pkv.Groups[1].Value;
+                string pvalue = Unquote(pkv.Groups[2].Value.Trim());
+
+                if (indent <= 4)
+                {
+                    if (pkey == "name") curProfile.name = pvalue;
+                    else if (pkey == "dependencies")
+                    {
+                        if (pvalue.Length != 0)
+                            throw new YamlException($"line {n}: dependencies must be a list (no value on the key line)");
+                        curProfile.dependencies = new List<DependencyEntry>();
+                        inDependencies = true;
+                    }
+                    else throw new YamlException($"line {n}: unknown profile key '{pkey}'");
+                    continue;
+                }
+
+                if (!inDependencies)
+                    throw new YamlException($"line {n}: dependency entry outside a 'dependencies:' list");
+                if (indent == 6 && line.StartsWith("- "))
+                {
+                    curDependency = new DependencyEntry();
+                    curProfile.dependencies.Add(curDependency);
+                    line = line.Substring(2).Trim();
+                }
+                else if (indent == 6)
+                {
+                    throw new YamlException($"line {n}: expected a '- ' dependency item at this indentation, got: {line}");
+                }
+                if (curDependency == null)
+                    throw new YamlException($"line {n}: dependency key before '- ' item start");
+                if (!Contains(DependencyKeys, pkey))
+                    throw new YamlException($"line {n}: unknown dependency key '{pkey}'");
+                if (pkey == "name") curDependency.name = pvalue;
+                else if (pkey == "version") curDependency.version = pvalue;
+                else if (pkey == "install_type") curDependency.install_type = pvalue;
+                else if (pkey == "prompt") curDependency.prompt = pvalue;
+                else if (pkey == "quiet_args") curDependency.quiet_args = pvalue;
+                else if (pkey == "url") curDependency.url = pvalue;
+                else if (pkey == "url_type") curDependency.url_type = pvalue;
+                continue;
+            }
 
             if (inMirrors && indent >= 6)
             {
@@ -289,7 +404,7 @@ internal static class VersionsYaml
             else if (key2 == "xdelta_url") curVersion.xdelta_url = value;
             else if (key2 == "xdelta_url_type") curVersion.xdelta_url_type = value;
             else if (key2 == "install_type") curVersion.install_type = value;
-            else if (key2 == "download_type") curVersion.download_type = value;
+            else if (key2 == "dependency_profile") curVersion.dependency_profile = value;
         }
 
         Validate(model);
@@ -309,12 +424,49 @@ internal static class VersionsYaml
                 throw new YamlException($"duplicate version '{v.version}'");
             if (v.install_type != null && v.install_type != "uwp" && v.install_type != "msixvc")
                 throw new YamlException($"version {v.version}: invalid install_type '{v.install_type}'");
-            if (v.download_type != null && v.download_type != "direct" && v.download_type != "zip")
-                throw new YamlException($"version {v.version}: invalid download_type '{v.download_type}'");
             if (v.url_type != null && v.url_type != "direct" && v.url_type != "zip")
                 throw new YamlException($"version {v.version}: invalid url_type '{v.url_type}'");
             if (v.mirror_type != null && v.mirror_type != "direct" && v.mirror_type != "zip")
                 throw new YamlException($"version {v.version}: invalid mirror_type '{v.mirror_type}'");
+        }
+
+        var seenProfiles = new HashSet<string>();
+        foreach (DependencyProfile p in model.dependency_profiles)
+        {
+            if (string.IsNullOrEmpty(p.name))
+                throw new YamlException("dependency profile missing name");
+            if (!seenProfiles.Add(p.name))
+                throw new YamlException($"duplicate dependency profile '{p.name}'");
+            if (p.dependencies == null || p.dependencies.Count == 0)
+                throw new YamlException($"dependency profile '{p.name}' has no dependencies");
+            var seenDeps = new HashSet<string>();
+            foreach (DependencyEntry d in p.dependencies)
+            {
+                if (string.IsNullOrEmpty(d.name) || string.IsNullOrEmpty(d.version))
+                    throw new YamlException($"dependency missing name or version (profile '{p.name}', near '{d.name}')");
+                if (!seenDeps.Add(d.name))
+                    throw new YamlException($"duplicate dependency '{d.name}' in profile '{p.name}'");
+                if (d.install_type != "appx" && d.install_type != "exe" && d.install_type != "ask")
+                    throw new YamlException($"profile '{p.name}', dependency {d.name}: install_type must be appx, exe or ask");
+                if (d.install_type == "ask")
+                {
+                    if (string.IsNullOrEmpty(d.prompt))
+                        throw new YamlException($"profile '{p.name}', dependency {d.name}: install_type ask requires a prompt");
+                    if (!string.IsNullOrEmpty(d.url))
+                        throw new YamlException($"profile '{p.name}', dependency {d.name}: install_type ask must not have a url");
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(d.url))
+                        throw new YamlException($"profile '{p.name}', dependency {d.name}: missing url");
+                    if (!string.IsNullOrEmpty(d.prompt))
+                        throw new YamlException($"profile '{p.name}', dependency {d.name}: prompt only applies to install_type ask");
+                }
+                if (d.url_type != null && d.url_type != "direct" && d.url_type != "zip")
+                    throw new YamlException($"profile '{p.name}', dependency {d.name}: invalid url_type '{d.url_type}'");
+                if (d.quiet_args != null && d.install_type != "exe")
+                    throw new YamlException($"profile '{p.name}', dependency {d.name}: quiet_args only applies to install_type exe");
+            }
         }
     }
 
@@ -354,6 +506,7 @@ internal class AppxListJsonFromText
     public static string BASEPPATH = "./../../";
 
     private static readonly VersionEntry.Version MsixvcThreshold = new VersionEntry.Version("1.21.120.0");
+    private static readonly VersionEntry.Version EngagementDropThreshold = new VersionEntry.Version("1.21.60.0");
 
     public int main()
     {
@@ -471,7 +624,12 @@ internal class AppxListJsonFromText
             {
                 entries.Add(ToV2(v));
             }
-            File.WriteAllText(BASEPPATH + "versionsv2.json", JsonSerializer.Serialize(entries));
+            VersionsV2Payload payload = new VersionsV2Payload
+            {
+                versions = entries,
+                dependency_profiles = ToDependencyProfiles(model),
+            };
+            File.WriteAllText(BASEPPATH + "versionsv2.json", JsonSerializer.Serialize(payload));
         }
         catch (Exception ex)
         {
@@ -484,11 +642,50 @@ internal class AppxListJsonFromText
         return 0;
     }
 
+    private static Dictionary<string, List<DependencyJson>> ToDependencyProfiles(YamlModel model)
+    {
+        Dictionary<string, List<DependencyJson>> profiles = new Dictionary<string, List<DependencyJson>>();
+        foreach (DependencyProfile p in model.dependency_profiles)
+        {
+            List<DependencyJson> deps = new List<DependencyJson>();
+            foreach (DependencyEntry d in p.dependencies)
+            {
+                deps.Add(new DependencyJson
+                {
+                    name = d.name,
+                    version = d.version,
+                    install_type = d.install_type,
+                    prompt = d.install_type == "ask" ? d.prompt : null,
+                    quiet_args = string.IsNullOrWhiteSpace(d.quiet_args)
+                        ? null
+                        : new List<string>(d.quiet_args.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries)),
+                    url = d.install_type == "ask"
+                        ? null
+                        : new Download
+                        {
+                            type = d.url_type ?? InferUrlType(d.url),
+                            url = d.url,
+                        },
+                });
+            }
+            profiles[p.name] = deps;
+        }
+        return profiles;
+    }
+
+    private static string DefaultDependencyProfile(VersionEntry.Version num)
+    {
+        if (num.AtLeast(MsixvcThreshold)) return "gdk";
+        if (num.AtLeast(EngagementDropThreshold)) return "uwp";
+        return "uwp_engagement";
+    }
+
     private static VersionEntryV2 ToV2(VersionData v)
     {
         VersionEntry.Version num = new VersionEntry.Version(v.version);
 
         string installType = v.install_type ?? (num.AtLeast(MsixvcThreshold) ? "msixvc" : "uwp");
+        string dependencyProfile = v.dependency_profile ?? DefaultDependencyProfile(num);
 
         Download url = new Download
         {
@@ -523,6 +720,7 @@ internal class AppxListJsonFromText
             package_version = v.package_version,
             sdk = v.sdk,
             install_type = installType,
+            dependency_profile = dependencyProfile,
             url = url,
             mirror_url = mirror,
             xdelta_url = xdelta,
