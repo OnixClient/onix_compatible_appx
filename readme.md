@@ -3,6 +3,8 @@
 
 ## Appx files are in the Releases
 * Dependencies are in the repository
+  * The GDK versions need the UWPDesktop variant.
+  * GDK versions also need windows app runtime https://aka.ms/windowsappsdk/1.8/latest/windowsappruntimeinstall-x64.exe
 * List of available versions is in the repository
 * List of available versions is generated from versions.yaml, the old v1 docs are in OldV1Docs.txt
 
