@@ -1,2 +1,5 @@
 # Build intermediates (final binaries are committed under JsonGenerator/net6.0/)
 JsonGenerator/obj/
+
+# Local agent guidance, never commit
+CLAUDE.md
