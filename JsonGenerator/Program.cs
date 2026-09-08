@@ -64,6 +64,8 @@ internal class DownloadUrl
 {
     public string url { get; set; }
     public string type { get; set; }
+    public string sha256 { get; set; }
+    public string xxh3_64 { get; set; }
 }
 
 internal class DependencyEntry
@@ -75,6 +77,8 @@ internal class DependencyEntry
     public string quiet_args { get; set; }
     public string url { get; set; }
     public string url_type { get; set; }
+    public string sha256 { get; set; }
+    public string xxh3_64 { get; set; }
 }
 
 internal class DependencyProfile
@@ -87,6 +91,8 @@ internal class Download
 {
     public string type { get; set; }
     public object url { get; set; }
+    public string sha256 { get; set; }
+    public string xxh3_64 { get; set; }
 }
 
 internal class VersionEntryV2
@@ -138,11 +144,15 @@ internal class VersionData
     public bool sdk { get; set; }
     public string url { get; set; }
     public string url_type { get; set; }
+    public string sha256 { get; set; }
+    public string xxh3_64 { get; set; }
     public List<string> mirror_urls { get; set; }
     public List<DownloadUrl> mirror_typed { get; set; }
     public string mirror_type { get; set; }
     public string xdelta_url { get; set; }
     public string xdelta_url_type { get; set; }
+    public string xdelta_sha256 { get; set; }
+    public string xdelta_xxh3_64 { get; set; }
     public string install_type { get; set; }
     public string dependency_profile { get; set; }
 }
@@ -161,10 +171,16 @@ internal class YamlException : Exception
 
 internal static class VersionsYaml
 {
-    private static readonly string[] VersionKeys = { "version", "package_version", "sdk", "url", "url_type",
-        "mirror_urls", "mirror_type", "xdelta_url", "xdelta_url_type", "install_type", "dependency_profile" };
+    private static readonly string[] VersionKeys = { "version", "package_version", "sdk", "url", "url_type", "sha256", "xxh3_64",
+        "mirror_urls", "mirror_type", "xdelta_url", "xdelta_url_type", "xdelta_sha256", "xdelta_xxh3_64", "install_type", "dependency_profile" };
 
-    private static readonly string[] DependencyKeys = { "name", "version", "install_type", "prompt", "quiet_args", "url", "url_type" };
+    private static readonly string[] DependencyKeys = { "name", "version", "install_type", "prompt", "quiet_args", "url", "url_type", "sha256", "xxh3_64" };
+
+    private static readonly string[] MirrorKeys = { "url", "type", "sha256", "xxh3_64" };
+
+    private static bool IsSha256(string s) => s == "" || (s != null && Regex.IsMatch(s, @"^[0-9a-f]{64}$"));
+
+    private static bool IsXxh3(string s) => s == "" || (s != null && Regex.IsMatch(s, @"^[0-9a-f]{16}$"));
 
     private static string InferUrlType(string url)
     {
@@ -300,6 +316,8 @@ internal static class VersionsYaml
                 else if (pkey == "quiet_args") curDependency.quiet_args = pvalue;
                 else if (pkey == "url") curDependency.url = pvalue;
                 else if (pkey == "url_type") curDependency.url_type = pvalue;
+                else if (pkey == "sha256") curDependency.sha256 = pvalue;
+                else if (pkey == "xxh3_64") curDependency.xxh3_64 = pvalue;
                 continue;
             }
 
@@ -316,9 +334,12 @@ internal static class VersionsYaml
                         throw new YamlException($"line {n}: expected 'key: value' in mirror item, got: {line}");
                     string k = mk.Groups[1].Value;
                     string v = Unquote(mk.Groups[2].Value.Trim());
+                    if (!Contains(MirrorKeys, k))
+                        throw new YamlException($"line {n}: unknown mirror key '{k}'");
                     if (k == "url") curMirror.url = v;
                     else if (k == "type") curMirror.type = v;
-                    else throw new YamlException($"line {n}: unknown mirror key '{k}'");
+                    else if (k == "sha256") curMirror.sha256 = v;
+                    else if (k == "xxh3_64") curMirror.xxh3_64 = v;
                     if (k == "url")
                     {
                         int idx = curVersion.mirror_typed.IndexOf(curMirror);
@@ -336,13 +357,17 @@ internal static class VersionsYaml
                         inMirrorMap = true;
                         string k = mk.Groups[1].Value;
                         string v = Unquote(mk.Groups[2].Value.Trim());
+                        if (!Contains(MirrorKeys, k))
+                            throw new YamlException($"line {n}: unknown mirror key '{k}'");
                         if (k == "url") curMirror.url = v;
                         else if (k == "type") curMirror.type = v;
-                        else throw new YamlException($"line {n}: unknown mirror key '{k}'");
+                        else if (k == "sha256") curMirror.sha256 = v;
+                        else if (k == "xxh3_64") curMirror.xxh3_64 = v;
                         curVersion.mirror_urls.Add(curMirror.url);
                         curVersion.mirror_typed.Add(curMirror);
                         continue;
                     }
+                    throw new YamlException($"line {n}: mirror parts need hashes, use the mapping form: '- url: <url>' followed by sha256/xxh3_64 lines");
                     curMirror = null;
                     inMirrorMap = false;
                     curVersion.mirror_urls.Add(Unquote(rest));
@@ -394,6 +419,8 @@ internal static class VersionsYaml
             }
             else if (key2 == "url") curVersion.url = value;
             else if (key2 == "url_type") curVersion.url_type = value;
+            else if (key2 == "sha256") curVersion.sha256 = value;
+            else if (key2 == "xxh3_64") curVersion.xxh3_64 = value;
             else if (key2 == "mirror_urls")
             {
                 if (value.Length != 0)
@@ -403,6 +430,8 @@ internal static class VersionsYaml
             else if (key2 == "mirror_type") curVersion.mirror_type = value;
             else if (key2 == "xdelta_url") curVersion.xdelta_url = value;
             else if (key2 == "xdelta_url_type") curVersion.xdelta_url_type = value;
+            else if (key2 == "xdelta_sha256") curVersion.xdelta_sha256 = value;
+            else if (key2 == "xdelta_xxh3_64") curVersion.xdelta_xxh3_64 = value;
             else if (key2 == "install_type") curVersion.install_type = value;
             else if (key2 == "dependency_profile") curVersion.dependency_profile = value;
         }
@@ -428,6 +457,20 @@ internal static class VersionsYaml
                 throw new YamlException($"version {v.version}: invalid url_type '{v.url_type}'");
             if (v.mirror_type != null && v.mirror_type != "direct" && v.mirror_type != "zip")
                 throw new YamlException($"version {v.version}: invalid mirror_type '{v.mirror_type}'");
+            if (!IsSha256(v.sha256) || !IsXxh3(v.xxh3_64))
+                throw new YamlException($"version {v.version}: url needs a sha256 (64 hex chars) and an xxh3_64 (16 hex chars)");
+            if (v.xdelta_url != null && (!IsSha256(v.xdelta_sha256) || !IsXxh3(v.xdelta_xxh3_64)))
+                throw new YamlException($"version {v.version}: xdelta_url needs a xdelta_sha256 and a xdelta_xxh3_64");
+            if (v.mirror_urls != null)
+            {
+                foreach (DownloadUrl m in v.mirror_typed)
+                {
+                    if (m == null)
+                        throw new YamlException($"version {v.version}: mirror parts need hashes, use the mapping form with sha256 and xxh3_64");
+                    if (!IsSha256(m.sha256) || !IsXxh3(m.xxh3_64))
+                        throw new YamlException($"version {v.version}: mirror part {m.url} needs a sha256 and an xxh3_64");
+                }
+            }
         }
 
         var seenProfiles = new HashSet<string>();
@@ -464,6 +507,10 @@ internal static class VersionsYaml
                 }
                 if (d.url_type != null && d.url_type != "direct" && d.url_type != "zip")
                     throw new YamlException($"profile '{p.name}', dependency {d.name}: invalid url_type '{d.url_type}'");
+                if (d.install_type != "ask" && (!IsSha256(d.sha256) || !IsXxh3(d.xxh3_64)))
+                    throw new YamlException($"profile '{p.name}', dependency {d.name}: url needs a sha256 and an xxh3_64");
+                if (d.install_type == "ask" && (!string.IsNullOrEmpty(d.sha256) || !string.IsNullOrEmpty(d.xxh3_64)))
+                    throw new YamlException($"profile '{p.name}', dependency {d.name}: ask dependencies have no url so they take no hashes");
                 if (d.quiet_args != null && d.install_type != "exe")
                     throw new YamlException($"profile '{p.name}', dependency {d.name}: quiet_args only applies to install_type exe");
             }
@@ -665,6 +712,8 @@ internal class AppxListJsonFromText
                         {
                             type = d.url_type ?? InferUrlType(d.url),
                             url = d.url,
+                            sha256 = d.sha256,
+                            xxh3_64 = d.xxh3_64,
                         },
                 });
             }
@@ -691,6 +740,8 @@ internal class AppxListJsonFromText
         {
             type = v.url_type ?? InferUrlType(v.url),
             url = v.url,
+            sha256 = v.sha256,
+            xxh3_64 = v.xxh3_64,
         };
 
         Download mirror = null;
@@ -705,13 +756,43 @@ internal class AppxListJsonFromText
                     if (typed != null && typed.type != null) { type = typed.type; break; }
                 }
             }
-            mirror = new Download { type = type, url = v.mirror_urls.Count == 1 ? (object)v.mirror_urls[0] : v.mirror_urls };
+            if (v.mirror_urls.Count == 1)
+            {
+                mirror = new Download
+                {
+                    type = type,
+                    url = v.mirror_urls[0],
+                    sha256 = v.mirror_typed[0].sha256,
+                    xxh3_64 = v.mirror_typed[0].xxh3_64,
+                };
+            }
+            else
+            {
+                List<Download> parts = new List<Download>();
+                for (int i = 0; i < v.mirror_urls.Count; i++)
+                {
+                    parts.Add(new Download
+                    {
+                        type = v.mirror_typed[i].type ?? type,
+                        url = v.mirror_urls[i],
+                        sha256 = v.mirror_typed[i].sha256,
+                        xxh3_64 = v.mirror_typed[i].xxh3_64,
+                    });
+                }
+                mirror = new Download { type = type, url = parts, sha256 = "", xxh3_64 = "" };
+            }
         }
 
         Download xdelta = null;
         if (v.xdelta_url != null)
         {
-            xdelta = new Download { type = v.xdelta_url_type ?? InferUrlType(v.xdelta_url), url = v.xdelta_url };
+            xdelta = new Download
+            {
+                type = v.xdelta_url_type ?? InferUrlType(v.xdelta_url),
+                url = v.xdelta_url,
+                sha256 = v.xdelta_sha256,
+                xxh3_64 = v.xdelta_xxh3_64,
+            };
         }
 
         return new VersionEntryV2

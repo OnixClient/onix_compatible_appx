@@ -21,16 +21,18 @@ An object holding the version list and the dependency profiles the versions refe
 * `mirror_url` - *(object|null) The same package as the primary download, mirrored from GitHub. Null when there is no mirror.*
 * `xdelta_url` - *(object|null) The xdelta3 patch file for this release, null when the release has no delta.*
 
-Every download field is an object: `type` plus `url`.
+Every download field is an object: `type` plus `url` plus the hashes of the file the url gives you.
 * `type` - *(string) `direct` or `zip` (what the url gives you).*
-* `url` - *(string or array of strings) One url, or the ordered parts of a split file.*
+* `url` - *(string, or array of part objects) One url, or the file's parts when the file is split. Each part object has the same shape as this one: `type`, `url`, `sha256`, `xxh3_64` describing that part.*
+* `sha256` - *(string) The SHA-256 of the file the url gives you, or of that part when `url` is an array of parts. Empty string means the url is not pinned to one file (a "latest" link), skip verification.*
+* `xxh3_64` - *(string) The XXH3-64 hash of the file the url gives you as 16 lowercase hex chars, same rules as `sha256`. Verify with this one first, it is much faster.*
 
 ### Download types
 The `type` of a download describes what its url gives you:
 * `direct` - *The url is the package file itself. Download it and install it per `install_type`.*
 * `zip` - *The url gives a zip that contains the package file. Download the zip and extract the package from it.*
 
-To use a download, take every url in its `url` in order, then:
+To use a download, take its url (or every part's url, in order, when the file is split), then:
 * If `type` is `direct` and there is a single url, that url is the package file, install it per `install_type`.
 * If `type` is `direct` and there are multiple urls, the parts are one file split to fit a size limit.
 Concatenate the parts in order to get the package file, then install it per `install_type`.
@@ -43,6 +45,8 @@ per `install_type`.
 ### Mirrors
 `mirror_url` mirrors the same package as the primary `url`, so its type can differ from the primary's
 (the mirror is zipped even when the primary is a direct file, or the other way around).
+When the file is split, the wrapper's own hashes are empty strings and each part object carries that
+part's real hashes.
 
 ### Dependency profiles (dependency_profiles)
 A map of profile name to a list of dependencies that the versions referencing that profile need.
