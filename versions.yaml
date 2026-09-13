@@ -38,7 +38,7 @@ dependency_profiles:
         install_type: ask
         prompt: Please update the Xbox App in the microsoft store then open it once before attempting to install this version.
       - name: Microsoft.GamingServices
-        version: 38.116.6003.0
+        version: 37.114.26001
         install_type: ask
         prompt: Please update the Xbox App in the microsoft store then open it once before attempting to install this version.
       - name: Microsoft.VCLibs.140.00.UWPDesktop
