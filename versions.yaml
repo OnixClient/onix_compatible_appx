@@ -36,11 +36,11 @@ dependency_profiles:
       - name: Microsoft.GamingApp
         version: 2608.1001.17.0
         install_type: ask
-        prompt: "Install the Xbox App from the Microsoft Store and open it once, letting it update. If its update fails, press Get Updates in the Store's library first."
+        prompt: "Install the Xbox App from the Microsoft Store and open it once, letting it update. If its update fails, press Get Updates in the Store's library first. You may need to repeat this."
       - name: Microsoft.GamingServices
         version: 37.114.26001
         install_type: ask
-        prompt: "Install the Xbox App from the Microsoft Store and open it once, letting it update. If its update fails, press Get Updates in the Store's library first."
+        prompt: "Install the Xbox App from the Microsoft Store and open it once, letting it update. If its update fails, press Get Updates in the Store's library first. You may need to repeat this."
       - name: Microsoft.VCLibs.140.00.UWPDesktop
         version: 14.0.33728.0
         install_type: appx
