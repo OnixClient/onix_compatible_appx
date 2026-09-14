@@ -65,9 +65,9 @@ versions:
       - url: https://github.com/OnixClient/onix_compatible_appx/releases/download/1.26.45/1.26.45.zip.001
         sha256: 9bf5767515f3349e3f23105aa4e884d52f6732281b4871c60725ef075760b014
         xxh3_64: 7d692a7d1bc3658c
-      - url: https://github.com/OnixClient/onix_compatible_appx/releases/download/1.26.45/1.26.44.zip.002
-        sha256: b5d0507b6de1258606b5c5b2c7a762dc760a3e63943df77eeea319909b4427b4
-        xxh3_64: acc2ce9ecf2d6eb5
+      - url: https://github.com/OnixClient/onix_compatible_appx/releases/download/1.26.45/1.26.45.zip.002
+        sha256: 8afe6171f6d8f38d16ab018a0024f9a1bea31bcbc753739e2b131c5068667bec
+        xxh3_64: f644954f3ec023c0
     xdelta_url: https://github.com/OnixClient/onix_compatible_appx/releases/download/1.26.45/1.26.45.msixvc.xdelta3
     xdelta_sha256: 925445676106b87201639b1f114bb1f63ec2ab0afaed5a95c250bc8bf7e9e6cc
     xdelta_xxh3_64: a8df1d4bbfc204a8
