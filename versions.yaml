@@ -56,6 +56,19 @@ dependency_profiles:
         xxh3_64: ""
 
 versions:
+  - version: 1.26.50
+    package_version: 1.26.5004.0
+    sdk: true
+    url: http://assets1.xboxlive.com/15/889f0637-a9a1-481d-a019-789cfa3c8350/7792d9ce-355a-493c-afbd-768f4a77c3b0/1.26.5004.0.4df08a0f-ae5b-4ad1-8260-c6e0294856ab/Microsoft.MinecraftUWP_1.26.5004.0_x64__8wekyb3d8bbwe.msixvc
+    sha256: 1a90cdd598ae9ae813eacc171f7ad4a84bd84e932ef34b79b89f838bd94e56a8
+    xxh3_64: ab38c45c068f6040
+    mirror_urls:
+      - url: https://github.com/OnixClient/onix_compatible_appx/releases/download/1.26.50/1.26.50.msixvc
+        sha256: 1a90cdd598ae9ae813eacc171f7ad4a84bd84e932ef34b79b89f838bd94e56a8
+        xxh3_64: ab38c45c068f6040
+    xdelta_url: https://github.com/OnixClient/onix_compatible_appx/releases/download/1.26.50/1.26.50.msixvc.xdelta3
+    xdelta_sha256: 1e15b32a4e27d58954ca1fc0820ffd146314a58c5cbcc03d5c7a8c30844ac27b
+    xdelta_xxh3_64: dffa9c669028f502
   - version: 1.26.45
     package_version: 1.26.4501.0
     url: http://assets1.xboxlive.com/Z/8a3dfbab-b161-470f-8b42-c94f0b4f8f6f/7792d9ce-355a-493c-afbd-768f4a77c3b0/1.26.4501.0.8f39f343-cd87-4b76-8994-dc8310fc2f06/Microsoft.MinecraftUWP_1.26.4501.0_x64__8wekyb3d8bbwe.msixvc
