@@ -62,9 +62,9 @@ versions:
     sha256: af5a72dab1a6e72fb63f931f5d80961b85090142994b93d60d8cd7a3d5a5f6c4
     xxh3_64: ec1fc4a0802d72b5
     mirror_urls:
-      - url: https://github.com/OnixClient/onix_compatible_appx/releases/download/1.26.52.26.52.msixvc
-      sha256: af5a72dab1a6e72fb63f931f5d80961b85090142994b93d60d8cd7a3d5a5f6c4
-      xxh3_64: ec1fc4a0802d72b5
+      - url: https://github.com/OnixClient/onix_compatible_appx/releases/download/1.26.52/1.26.52.msixvc
+        sha256: af5a72dab1a6e72fb63f931f5d80961b85090142994b93d60d8cd7a3d5a5f6c4
+        xxh3_64: ec1fc4a0802d72b5
     xdelta_url: https://github.com/OnixClient/onix_compatible_appx/releases/download/1.26.52/1.26.52.msixvc.xdelta3
     xdelta_sha256: 08fe3860019480c473c3f3a64f9c0d20d1c9a1e51cb9d9e46134ad3234f36105
     xdelta_xxh3_64: bcd800b3b5f4f82d
@@ -74,9 +74,9 @@ versions:
     sha256: d7766a9e48704edacf385def584fe2ad436082a07fdd6d0fdd6568da45e3df85
     xxh3_64: 49e0160982654945
     mirror_urls:
-      - url: https://github.com/OnixClient/onix_compatible_appx/releases/download/1.26.51.26.51.msixvc
-      sha256: d7766a9e48704edacf385def584fe2ad436082a07fdd6d0fdd6568da45e3df85
-      xxh3_64: 49e0160982654945
+      - url: https://github.com/OnixClient/onix_compatible_appx/releases/download/1.26.51/1.26.51.msixvc
+        sha256: d7766a9e48704edacf385def584fe2ad436082a07fdd6d0fdd6568da45e3df85
+        xxh3_64: 49e0160982654945
     xdelta_url: https://github.com/OnixClient/onix_compatible_appx/releases/download/1.26.51/1.26.51.msixvc.xdelta3
     xdelta_sha256: a0e9334dc3930b57e809a5133d2db982851a6bebb167b67542886e87a581c05b
     xdelta_xxh3_64: af9382ddcc5198d1

@@ -750,7 +750,7 @@ internal class AppxListJsonFromText
             string type = v.mirror_type;
             if (type == null)
             {
-                type = "zip";
+                type = InferUrlType(v.mirror_urls[0]);
                 foreach (DownloadUrl typed in v.mirror_typed)
                 {
                     if (typed != null && typed.type != null) { type = typed.type; break; }
